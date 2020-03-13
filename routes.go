@@ -32,22 +32,25 @@ const StatusName = "STATUS"
 const RegisterName = "REGISTER"
 const LoginName = "LOGIN"
 
+const GET = "GET"
+const POST = "POST"
+
 var routes = Routes{
 	Route{
 		StatusName,
-		"GET",
+		GET,
 		"/",
 		Status,
 	},
 	Route{
 		RegisterName,
-		"POST",
+		POST,
 		"/register",
 		Register,
 	},
 	Route{
 		LoginName,
-		"POST",
+		POST,
 		"/login",
 		Login,
 	},
