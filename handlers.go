@@ -111,7 +111,7 @@ func Refresh(w http.ResponseWriter, r *http.Request) {
 	claims.ExpiresAt = expirationTime.Unix()
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString(jwtKey)
-	
+
 	if err != nil {
 		handleJWTSigningError(&w, RefreshName, err)
 		return
