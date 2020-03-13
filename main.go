@@ -1,11 +1,18 @@
-package authentication
+package main
 
 import (
-	"log"
+	"fmt"
+	log "github.com/sirupsen/logrus"
 	"net/http"
 )
 
+const host = "localhost"
+const port = 8080
+
 func main() {
 	router := NewRouter()
-	log.Fatal(http.ListenAndServe(":8080", router))
+	addr := fmt.Sprintf("%s:%d", host, port)
+
+	log.Info("Starting AUTHENTICATION server...")
+	log.Fatal(http.ListenAndServe(addr, router))
 }

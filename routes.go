@@ -1,4 +1,4 @@
-package authentication
+package main
 
 import (
 	"github.com/gorilla/mux"
@@ -28,11 +28,27 @@ func NewRouter() *mux.Router {
 	return router
 }
 
+const StatusName = "STATUS"
+const RegisterName = "REGISTER"
+const LoginName = "LOGIN"
+
 var routes = Routes{
 	Route{
-		"Status",
+		StatusName,
 		"GET",
 		"/",
 		Status,
+	},
+	Route{
+		RegisterName,
+		"POST",
+		"/register",
+		Register,
+	},
+	Route{
+		LoginName,
+		"POST",
+		"/login",
+		Login,
 	},
 }
