@@ -31,6 +31,7 @@ func NewRouter() *mux.Router {
 const StatusName = "STATUS"
 const RegisterName = "REGISTER"
 const LoginName = "LOGIN"
+const RefreshName = "REFRESH"
 
 const GET = "GET"
 const POST = "POST"
@@ -53,5 +54,11 @@ var routes = Routes{
 		POST,
 		"/login",
 		Login,
+	},
+	Route{
+		RefreshName,
+		POST,
+		"/refresh",
+		Refresh,
 	},
 }
