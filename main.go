@@ -14,6 +14,6 @@ func main() {
 	router := utils.NewRouter(routes)
 	addr := fmt.Sprintf("%s:%d", host, Port)
 
-	log.Info("Starting AUTHENTICATION server...")
+	log.Infof("Starting AUTHENTICATION server in port %d...\n", Port)
 	log.Fatal(http.ListenAndServe(addr, router))
 }
