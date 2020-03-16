@@ -39,7 +39,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Infof("Registered: %s\n", request.Username)
+	log.Infof("%s: %s\n", RegisterName, request.Username)
 }
 
 // Logs in a user. Expects a JSON with username and password in the body.
@@ -79,7 +79,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		Expires: expirationTime,
 	})
 
-	log.Infof("Login: %s\n", request.Username)
+	log.Infof("%s: %s\n", LoginName, request.Username)
 }
 
 // Endpoint to refresh the token. Expects the user to already have a token.
@@ -128,5 +128,5 @@ func Refresh(w http.ResponseWriter, r *http.Request) {
 		Expires: expirationTime,
 	})
 
-	log.Infof("Refresh: %s\n", claims.Username)
+	log.Infof("%s: %s\n", RefreshName, claims.Username)
 }
