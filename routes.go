@@ -1,32 +1,8 @@
 package main
 
 import (
-	"github.com/gorilla/mux"
-	"net/http"
+	"github.com/NOVAPokemon/utils"
 )
-
-type Route struct {
-	Name        string
-	Method      string
-	Pattern     string
-	HandlerFunc http.HandlerFunc
-}
-
-type Routes []Route
-
-func NewRouter() *mux.Router {
-
-	router := mux.NewRouter().StrictSlash(true)
-	for _, route := range routes {
-		router.
-			Methods(route.Method).
-			Path(route.Pattern).
-			Name(route.Name).
-			Handler(route.HandlerFunc)
-	}
-
-	return router
-}
 
 const StatusName = "STATUS"
 const RegisterName = "REGISTER"
@@ -36,29 +12,29 @@ const RefreshName = "REFRESH"
 const GET = "GET"
 const POST = "POST"
 
-var routes = Routes{
-	Route{
-		StatusName,
-		GET,
-		"/",
-		Status,
+var Routes = utils.Routes{
+	utils.Route{
+		Name: StatusName,
+		Method: GET,
+		Pattern:"/",
+		HandlerFunc: Status,
 	},
-	Route{
-		RegisterName,
-		POST,
-		"/register",
-		Register,
+	utils.Route{
+		Name: RegisterName,
+		Method: POST,
+		Pattern: "/register",
+		HandlerFunc: Register,
 	},
-	Route{
-		LoginName,
-		POST,
-		"/login",
-		Login,
+	utils.Route{
+		Name: LoginName,
+		Method: POST,
+		Pattern: "/login",
+		HandlerFunc: Login,
 	},
-	Route{
-		RefreshName,
-		POST,
-		"/refresh",
-		Refresh,
+	utils.Route{
+		Name: RefreshName,
+		Method: POST,
+		Pattern: "/refresh",
+		HandlerFunc: Refresh,
 	},
 }
