@@ -1,5 +1,5 @@
-github.com/NOVAPokemon/utils v0.0.0-20200316143112-bfd947fb5e71 h1:QaT420RHvZ3MwonPWuc4jBZctjUpBJNnIExV0rHzh04=
-github.com/NOVAPokemon/utils v0.0.0-20200316143112-bfd947fb5e71/go.mod h1:03zv8fsaclcmVqFRV4ksExTLlKJ8g6ktu0wwBT7yUYc=
+github.com/NOVAPokemon/utils v0.0.1 h1:0xtfykheEV55v9sIE4uQuU9W7ZCgq1JKHvoP2gAQIOY=
+github.com/NOVAPokemon/utils v0.0.1/go.mod h1:VjL7Gr3YgJNfymi1dT3vBgBeSTSLraLQ995WGHRIOfM=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/dgrijalva/jwt-go v3.2.0+incompatible h1:7qlOGliEKZXTDg6OTjfoBKDXWrumCAMpl/TFQ4/5kLM=

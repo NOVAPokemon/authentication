@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/NOVAPokemon/utils"
 	"github.com/dgrijalva/jwt-go"
 	log "github.com/sirupsen/logrus"
 	"net/http"
@@ -34,7 +35,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&request)
 
 	if err != nil {
-		handleJSONDecodeError(&w, RegisterName, err)
+		utils.HandleJSONDecodeError(&w, RegisterName, err)
 		return
 	}
 
@@ -47,7 +48,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&request)
 
 	if err != nil {
-		handleJSONDecodeError(&w, LoginName, err)
+		utils.HandleJSONDecodeError(&w, LoginName, err)
 		return
 	}
 
@@ -55,7 +56,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	expectedPassword := ""
 
 	if request.Password != expectedPassword {
-		handleWrongPasswordError(&w, LoginName, request.Username, request.Password)
+		utils.HandleWrongPasswordError(&w, LoginName, request.Username, request.Password)
 		return
 	}
 
@@ -68,7 +69,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	tokenString, err := token.SignedString(jwtKey)
 
 	if err != nil {
-		handleJWTSigningError(&w, LoginName, err)
+		utils.HandleJWTSigningError(&w, LoginName, err)
 		return
 	}
 
@@ -84,7 +85,7 @@ func Refresh(w http.ResponseWriter, r *http.Request) {
 	c, err := r.Cookie(TokenCookieName)
 
 	if err != nil {
-		handleCookieError(&w, RefreshName, err)
+		utils.HandleCookieError(&w, RefreshName, err)
 	}
 
 	tknStr := c.Value
@@ -94,7 +95,7 @@ func Refresh(w http.ResponseWriter, r *http.Request) {
 	})
 
 	if err != nil {
-		handleJWTVerifyingError(&w, RefreshName, err)
+		utils.HandleJWTVerifyingError(&w, RefreshName, err)
 	}
 
 	if !tkn.Valid {
@@ -114,7 +115,7 @@ func Refresh(w http.ResponseWriter, r *http.Request) {
 	tokenString, err := token.SignedString(jwtKey)
 
 	if err != nil {
-		handleJWTSigningError(&w, RefreshName, err)
+		utils.HandleJWTSigningError(&w, RefreshName, err)
 		return
 	}
 
