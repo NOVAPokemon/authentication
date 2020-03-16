@@ -7,11 +7,11 @@ import (
 )
 
 const host = "localhost"
-const port = 8080
+const Port = 8001
 
 func main() {
 	router := NewRouter()
-	addr := fmt.Sprintf("%s:%d", host, port)
+	addr := fmt.Sprintf("%s:%d", host, Port)
 
 	log.Info("Starting AUTHENTICATION server...")
 	log.Fatal(http.ListenAndServe(addr, router))
