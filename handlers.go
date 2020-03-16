@@ -73,12 +73,13 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.SetCookie(w, &http.Cookie{
-		Name: TokenCookieName,
-		Value: tokenString,
+		Name:    TokenCookieName,
+		Value:   tokenString,
 		Expires: expirationTime,
 	})
 }
 
+// Endpoint to refresh the token. Expects the user to already have a token.
 func Refresh(w http.ResponseWriter, r *http.Request) {
 	c, err := r.Cookie(TokenCookieName)
 
@@ -106,7 +107,7 @@ func Refresh(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Now, create a new token for the current use, with a renewed expiration time
+	// Now, create a new token for the current user, with a renewed expiration time
 	expirationTime := time.Now().Add(JWTDuration)
 	claims.ExpiresAt = expirationTime.Unix()
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
