@@ -11,7 +11,7 @@ const host = "localhost"
 const Port = 8001
 
 func main() {
-	router := utils.NewRouter(Routes)
+	router := utils.NewRouter(routes)
 	addr := fmt.Sprintf("%s:%d", host, Port)
 
 	log.Info("Starting AUTHENTICATION server...")

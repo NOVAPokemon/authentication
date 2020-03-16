@@ -12,7 +12,7 @@ const RefreshName = "REFRESH"
 const GET = "GET"
 const POST = "POST"
 
-var Routes = utils.Routes{
+var routes = utils.Routes{
 	utils.Route{
 		Name:        StatusName,
 		Method:      GET,
