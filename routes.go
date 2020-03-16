@@ -14,27 +14,27 @@ const POST = "POST"
 
 var Routes = utils.Routes{
 	utils.Route{
-		Name: StatusName,
-		Method: GET,
-		Pattern:"/",
+		Name:        StatusName,
+		Method:      GET,
+		Pattern:     "/",
 		HandlerFunc: Status,
 	},
 	utils.Route{
-		Name: RegisterName,
-		Method: POST,
-		Pattern: "/register",
+		Name:        RegisterName,
+		Method:      POST,
+		Pattern:     "/register",
 		HandlerFunc: Register,
 	},
 	utils.Route{
-		Name: LoginName,
-		Method: POST,
-		Pattern: "/login",
+		Name:        LoginName,
+		Method:      POST,
+		Pattern:     "/login",
 		HandlerFunc: Login,
 	},
 	utils.Route{
-		Name: RefreshName,
-		Method: POST,
-		Pattern: "/refresh",
+		Name:        RefreshName,
+		Method:      POST,
+		Pattern:     "/refresh",
 		HandlerFunc: Refresh,
 	},
 }
