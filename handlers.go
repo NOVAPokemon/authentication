@@ -4,8 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/NOVAPokemon/utils"
+	"github.com/NOVAPokemon/utils/database/user"
 	"github.com/dgrijalva/jwt-go"
 	log "github.com/sirupsen/logrus"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"time"
 )
@@ -39,7 +42,20 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Infof("%s: %s\n", RegisterName, request.Username)
+	userToAdd := utils.User{
+		Id:        primitive.NewObjectID(),
+		TrainerId: primitive.NewObjectID(),
+		Username:  request.Username,
+		PasswordHash: hashPassword([]byte(request.Password)),
+	}
+
+	err, id := user.AddUser(&userToAdd)
+
+	if err != nil {
+		return
+	}
+
+	log.Infof("%s: %s %s\n", RegisterName, request.Username, id)
 }
 
 // Logs in a user. Expects a JSON with username and password in the body.
@@ -53,9 +69,13 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// TEMPORARY while MongoDB API is not done
-	expectedPassword := ""
+	err, user := user.GetUserByUsername(request.Username)
 
-	if request.Password != expectedPassword {
+	if err != nil {
+		return
+	}
+
+	if !verifyPassword([]byte(request.Password), user.PasswordHash) {
 		utils.HandleWrongPasswordError(&w, LoginName, request.Username, request.Password)
 		return
 	}
@@ -88,6 +108,7 @@ func Refresh(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		utils.HandleCookieError(&w, RefreshName, err)
+		return
 	}
 
 	tknStr := c.Value
@@ -98,6 +119,7 @@ func Refresh(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		utils.HandleJWTVerifyingError(&w, RefreshName, err)
+		return
 	}
 
 	if !tkn.Valid {
@@ -106,7 +128,7 @@ func Refresh(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if time.Unix(claims.ExpiresAt, 0).Sub(time.Now()) > 2*time.Minute {
-		w.WriteHeader(http.StatusBadRequest)
+		utils.HandleToSoonToRefreshError(&w, RefreshName)
 		return
 	}
 
@@ -129,4 +151,24 @@ func Refresh(w http.ResponseWriter, r *http.Request) {
 	})
 
 	log.Infof("%s: %s\n", RefreshName, claims.Username)
+}
+
+func hashPassword(password []byte) (passwordHash []byte) {
+	hash, err := bcrypt.GenerateFromPassword(password, bcrypt.MinCost)
+	if err != nil {
+		log.Error(err)
+	}
+
+	return hash
+}
+
+func verifyPassword(password, expectedHash []byte) bool {
+	err := bcrypt.CompareHashAndPassword(expectedHash, password)
+
+	if err != nil {
+		log.Println(err)
+		return false
+	}
+
+	return true
 }
