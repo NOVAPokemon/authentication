@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"github.com/NOVAPokemon/authentication/auth"
 	"github.com/NOVAPokemon/utils"
+	trainerdb "github.com/NOVAPokemon/utils/database/trainer"
+	bagdb "github.com/NOVAPokemon/utils/database/bag"
 	userdb "github.com/NOVAPokemon/utils/database/user"
 	"github.com/dgrijalva/jwt-go"
 	log "github.com/sirupsen/logrus"
@@ -32,10 +34,23 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	bagToAdd := utils.Bag{
+		Id:    primitive.NewObjectID(),
+		Items: nil,
+	}
+
+	trainerToAdd := utils.Trainer{
+		Id:       primitive.NewObjectID(),
+		Bag:      bagToAdd.Id,
+		Pokemons: nil,
+		Level:    0,
+		Coins:    0,
+	}
+
 	userToAdd := utils.User{
-		Id:        primitive.NewObjectID(),
-		TrainerId: primitive.NewObjectID(),
-		Username:  request.Username,
+		Id:           primitive.NewObjectID(),
+		TrainerId:    trainerToAdd.Id,
+		Username:     request.Username,
 		PasswordHash: hashPassword([]byte(request.Password)),
 	}
 
@@ -45,7 +60,19 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Infof("%s: %s %s\n", RegisterName, request.Username, id)
+	err, trainerId := trainerdb.AddTrainer(trainerToAdd)
+
+	if err != nil {
+		return
+	}
+
+	err, bagId := bagdb.AddBag(bagToAdd)
+
+	if err != nil {
+		return
+	}
+
+	log.Infof("%s: %s %s %s %s\n", RegisterName, request.Username, id, trainerId, bagId)
 }
 
 // Logs in a user. Expects a JSON with username and password in the body.
@@ -72,8 +99,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	expirationTime := time.Now().Add(auth.JWTDuration)
 	claims := &auth.Claims{
-		Id: user.Id,
-		Username: request.Username,
+		Id:             user.Id,
+		Username:       request.Username,
 		StandardClaims: jwt.StandardClaims{ExpiresAt: expirationTime.Unix()},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
