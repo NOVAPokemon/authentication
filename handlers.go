@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/NOVAPokemon/authentication/auth"
 	"github.com/NOVAPokemon/utils"
-	"github.com/NOVAPokemon/utils/database/user"
+	userdb "github.com/NOVAPokemon/utils/database/user"
 	"github.com/dgrijalva/jwt-go"
 	log "github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -39,7 +39,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		PasswordHash: hashPassword([]byte(request.Password)),
 	}
 
-	err, id := user.AddUser(&userToAdd)
+	err, id := userdb.AddUser(&userToAdd)
 
 	if err != nil {
 		return
@@ -59,7 +59,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// TEMPORARY while MongoDB API is not done
-	err, user := user.GetUserByUsername(request.Username)
+	err, user := userdb.GetUserByUsername(request.Username)
 
 	if err != nil {
 		return
@@ -72,6 +72,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	expirationTime := time.Now().Add(auth.JWTDuration)
 	claims := &auth.Claims{
+		Id: user.Id,
 		Username: request.Username,
 		StandardClaims: jwt.StandardClaims{ExpiresAt: expirationTime.Unix()},
 	}
