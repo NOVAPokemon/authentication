@@ -40,7 +40,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	trainerToAdd := utils.Trainer{
-		Id:       primitive.NewObjectID(),
+		Username: request.Username,
 		Bag:      bagToAdd.Id,
 		Pokemons: nil,
 		Level:    0,
@@ -48,8 +48,6 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	userToAdd := utils.User{
-		Id:           primitive.NewObjectID(),
-		TrainerId:    trainerToAdd.Id,
 		Username:     request.Username,
 		PasswordHash: hashPassword([]byte(request.Password)),
 	}
@@ -85,7 +83,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TEMPORARY while MongoDB API is not done
 	err, user := userdb.GetUserByUsername(request.Username)
 
 	if err != nil {
@@ -97,10 +94,12 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	err, trainer := trainerdb.GetTrainerByUsername(request.Username)
+
 	expirationTime := time.Now().Add(auth.JWTDuration)
 	claims := &auth.Claims{
-		Id:             user.Id,
 		Username:       request.Username,
+		Trainer:        trainer,
 		StandardClaims: jwt.StandardClaims{ExpiresAt: expirationTime.Unix()},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

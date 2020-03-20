@@ -12,6 +12,7 @@ import (
 type Claims struct {
 	Id       primitive.ObjectID
 	Username string
+	Trainer  utils.Trainer
 	jwt.StandardClaims
 }
 
