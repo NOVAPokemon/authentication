@@ -34,8 +34,8 @@ func Register(w http.ResponseWriter, r *http.Request) {
 
 	trainerToAdd := utils.Trainer{
 		Username: request.Username,
-		Items:    map[string]*utils.Item{},
-		Pokemons: map[string]*utils.Pokemon{},
+		Items:    map[string]utils.Item{},
+		Pokemons: map[string]utils.Pokemon{},
 		Level:    0,
 		Coins:    0,
 	}
