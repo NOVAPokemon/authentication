@@ -85,6 +85,10 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	trainer, err := trainerdb.GetTrainerByUsername(request.Username)
 
+	if err != nil {
+		return
+	}
+
 	expirationTime := time.Now().Add(auth.JWTDuration)
 	claims := &auth.Claims{
 		Username:       request.Username,
