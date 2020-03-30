@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/NOVAPokemon/authentication/exported"
 	"github.com/NOVAPokemon/utils"
 )
 
@@ -16,25 +17,25 @@ var routes = utils.Routes{
 	utils.Route{
 		Name:        StatusName,
 		Method:      GET,
-		Pattern:     "/",
+		Pattern:     exported.StatusPath,
 		HandlerFunc: Status,
 	},
 	utils.Route{
 		Name:        RegisterName,
 		Method:      POST,
-		Pattern:     "/register",
+		Pattern:     exported.RegisterPath,
 		HandlerFunc: Register,
 	},
 	utils.Route{
 		Name:        LoginName,
 		Method:      POST,
-		Pattern:     "/login",
+		Pattern:     exported.LoginPath,
 		HandlerFunc: Login,
 	},
 	utils.Route{
 		Name:        RefreshName,
 		Method:      POST,
-		Pattern:     "/refresh",
+		Pattern:     exported.RefreshPath,
 		HandlerFunc: Refresh,
 	},
 }

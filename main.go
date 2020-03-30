@@ -7,13 +7,13 @@ import (
 	"net/http"
 )
 
-const host = "localhost"
-const Port = 8001
+const host = utils.Host
+const port = utils.AuthenticationPort
 
 func main() {
 	router := utils.NewRouter(routes)
-	addr := fmt.Sprintf("%s:%d", host, Port)
+	addr := fmt.Sprintf("%s:%d", host, port)
 
-	log.Infof("Starting AUTHENTICATION server in port %d...\n", Port)
+	log.Infof("Starting AUTHENTICATION server in port %d...\n", port)
 	log.Fatal(http.ListenAndServe(addr, router))
 }
