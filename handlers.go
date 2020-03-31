@@ -3,11 +3,10 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/NOVAPokemon/authentication/auth"
 	"github.com/NOVAPokemon/utils"
+	"github.com/NOVAPokemon/utils/cookies"
 	trainerdb "github.com/NOVAPokemon/utils/database/trainer"
 	userdb "github.com/NOVAPokemon/utils/database/user"
-	"github.com/dgrijalva/jwt-go"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
@@ -18,8 +17,8 @@ import (
 const StatusOnline = "online"
 
 // Indicates if the server is online.
-func Status(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, StatusOnline)
+func Status(w http.ResponseWriter, _ *http.Request) {
+	_, _ = fmt.Fprintln(w, StatusOnline)
 }
 
 // Registers a user. Expects a JSON with username and password in the body.
@@ -83,57 +82,21 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	trainer, err := trainerdb.GetTrainerByUsername(request.Username)
+	err = cookies.SetAuthToken(request.Username, LoginName, &w)
 
 	if err != nil {
+		log.Error(err)
 		return
 	}
-
-	expirationTime := time.Now().Add(auth.JWTDuration)
-	claims := &auth.Claims{
-		Username:       request.Username,
-		Trainer:        *trainer,
-		StandardClaims: jwt.StandardClaims{ExpiresAt: expirationTime.Unix()},
-	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString(auth.JWTKey)
-
-	if err != nil {
-		utils.HandleJWTSigningError(&w, LoginName, err)
-		return
-	}
-
-	http.SetCookie(w, &http.Cookie{
-		Name:    auth.TokenCookieName,
-		Value:   tokenString,
-		Expires: expirationTime,
-	})
 
 	log.Infof("%s: %s\n", LoginName, request.Username)
 }
 
 // Endpoint to refresh the token. Expects the user to already have a token.
 func Refresh(w http.ResponseWriter, r *http.Request) {
-	c, err := r.Cookie(auth.TokenCookieName)
+	claims, err := cookies.ExtractAndVerifyAuthToken(&w, r, RefreshName)
 
 	if err != nil {
-		utils.HandleCookieError(&w, RefreshName, err)
-		return
-	}
-
-	tknStr := c.Value
-	claims := &auth.Claims{}
-	tkn, err := jwt.ParseWithClaims(tknStr, claims, func(token *jwt.Token) (interface{}, error) {
-		return auth.JWTKey, nil
-	})
-
-	if err != nil {
-		utils.HandleJWTVerifyingError(&w, RefreshName, err)
-		return
-	}
-
-	if !tkn.Valid {
-		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
@@ -142,23 +105,11 @@ func Refresh(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Now, create a new token for the current user, with a renewed expiration time
-	expirationTime := time.Now().Add(auth.JWTDuration)
-	claims.ExpiresAt = expirationTime.Unix()
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString(auth.JWTKey)
+	err = cookies.SetAuthToken(claims.Username, RefreshName, &w)
 
 	if err != nil {
-		utils.HandleJWTSigningError(&w, RefreshName, err)
 		return
 	}
-
-	// Set the new token as the users `token` cookie
-	http.SetCookie(w, &http.Cookie{
-		Name:    auth.TokenCookieName,
-		Value:   tokenString,
-		Expires: expirationTime,
-	})
 
 	log.Infof("%s: %s\n", RefreshName, claims.Username)
 }
