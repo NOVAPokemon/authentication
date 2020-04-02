@@ -4,17 +4,25 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/NOVAPokemon/utils"
+	"github.com/NOVAPokemon/utils/clients"
 	"github.com/NOVAPokemon/utils/cookies"
-	trainerdb "github.com/NOVAPokemon/utils/database/trainer"
 	userdb "github.com/NOVAPokemon/utils/database/user"
 	log "github.com/sirupsen/logrus"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
+	"net/http/cookiejar"
 	"time"
 )
 
 // Constants
 const StatusOnline = "online"
+
+var trainersClient *clients.TrainersClient
+
+func init() {
+	trainersClient = clients.NewTrainersClient(fmt.Sprintf("%s:%d", host, utils.TrainersPort), &cookiejar.Jar{})
+}
 
 // Indicates if the server is online.
 func Status(w http.ResponseWriter, _ *http.Request) {
@@ -31,14 +39,17 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	trainerToAdd := utils.Trainer{
-		Username: request.Username,
-		Items:    map[string]utils.Item{},
-		Pokemons: map[string]utils.Pokemon{},
-		Stats: utils.TrainerStats{
-			Level: 0,
-			Coins: 0,
-		},
+	exists, err := userdb.CheckIfUserExists(request.Username)
+
+	if err != nil {
+		log.Error(err)
+		http.Error(w, "Error occurred registering user", http.StatusInternalServerError)
+		return
+	}
+
+	if exists {
+		http.Error(w, "User Already exists", http.StatusConflict)
+		return
 	}
 
 	userToAdd := utils.User{
@@ -49,16 +60,30 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	err, id := userdb.AddUser(&userToAdd)
 
 	if err != nil {
+		log.Error(err)
+		http.Error(w, "Error occurred registering user", http.StatusInternalServerError)
 		return
 	}
 
-	trainerId, err := trainerdb.AddTrainer(trainerToAdd)
+	trainerToAdd := utils.Trainer{
+		Username: request.Username,
+		Items:    generateStarterItems(6),
+		Pokemons: generateStarterPokemons(6),
+		Stats: utils.TrainerStats{
+			Level: 0,
+			Coins: 0,
+		},
+	}
+
+	_, err = trainersClient.AddTrainer(trainerToAdd)
 
 	if err != nil {
+		log.Error(err)
+		http.Error(w, "Error occurred registering trainer", http.StatusInternalServerError)
 		return
 	}
 
-	log.Infof("%s: %s %s %s\n", RegisterName, request.Username, id, trainerId)
+	log.Infof("%s: %s %s %s\n", RegisterName, request.Username, id, id)
 }
 
 // Logs in a user. Expects a JSON with username and password in the body.
@@ -74,6 +99,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	err, user := userdb.GetUserByUsername(request.Username)
 
 	if err != nil {
+		http.Error(w, "User Not Found", http.StatusNotFound)
 		return
 	}
 
@@ -86,6 +112,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Error(err)
+		http.Error(w, "Error occurred setting cookie", http.StatusInternalServerError)
 		return
 	}
 
@@ -132,4 +159,38 @@ func verifyPassword(password, expectedHash []byte) bool {
 	}
 
 	return true
+}
+
+func generateStarterItems(itemsNr int) map[string]utils.Item { //TODO only for testing
+
+	toReturn := make(map[string]utils.Item, itemsNr)
+
+	for i := 0; i < itemsNr; i++ {
+		newPokemon := utils.Item{
+			Id:   primitive.NewObjectID(),
+			Name: fmt.Sprintf("item %d", i),
+		}
+		toReturn[newPokemon.Id.Hex()] = newPokemon
+	}
+
+	return toReturn
+
+}
+
+func generateStarterPokemons(pokemonNr int) map[string]utils.Pokemon { //TODO only for testing
+
+	toReturn := make(map[string]utils.Pokemon, pokemonNr)
+
+	for i := 0; i < pokemonNr; i++ {
+		newPokemon := utils.Pokemon{
+			Id:      primitive.NewObjectID(),
+			Species: fmt.Sprintf("species %d", i),
+			Damage:  10,
+			Level:   0,
+		}
+		toReturn[newPokemon.Id.Hex()] = newPokemon
+	}
+
+	return toReturn
+
 }
