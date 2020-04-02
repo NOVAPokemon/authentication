@@ -5,13 +5,12 @@ import (
 	"fmt"
 	"github.com/NOVAPokemon/utils"
 	"github.com/NOVAPokemon/utils/clients"
-	"github.com/NOVAPokemon/utils/cookies"
 	userdb "github.com/NOVAPokemon/utils/database/user"
+	"github.com/NOVAPokemon/utils/tokens"
 	log "github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
-	"net/http/cookiejar"
 	"time"
 )
 
@@ -21,7 +20,7 @@ const StatusOnline = "online"
 var trainersClient *clients.TrainersClient
 
 func init() {
-	trainersClient = clients.NewTrainersClient(fmt.Sprintf("%s:%d", host, utils.TrainersPort), &cookiejar.Jar{})
+	trainersClient = clients.NewTrainersClient(fmt.Sprintf("%s:%d", host, utils.TrainersPort))
 }
 
 // Indicates if the server is online.
@@ -108,20 +107,13 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = cookies.SetAuthToken(request.Username, LoginName, &w)
-
-	if err != nil {
-		log.Error(err)
-		http.Error(w, "Error occurred setting cookie", http.StatusInternalServerError)
-		return
-	}
-
+	tokens.AddAuthToken(request.Username, w.Header())
 	log.Infof("%s: %s\n", LoginName, request.Username)
 }
 
 // Endpoint to refresh the token. Expects the user to already have a token.
 func Refresh(w http.ResponseWriter, r *http.Request) {
-	claims, err := cookies.ExtractAndVerifyAuthToken(&w, r, RefreshName)
+	claims, err := tokens.ExtractAndVerifyAuthToken(r.Header)
 
 	if err != nil {
 		return
@@ -132,12 +124,7 @@ func Refresh(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = cookies.SetAuthToken(claims.Username, RefreshName, &w)
-
-	if err != nil {
-		return
-	}
-
+	tokens.AddAuthToken(claims.Username, w.Header())
 	log.Infof("%s: %s\n", RefreshName, claims.Username)
 }
 
