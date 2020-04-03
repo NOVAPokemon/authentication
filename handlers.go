@@ -166,11 +166,11 @@ func generateStarterItems(itemsNr int) map[string]utils.Item { //TODO only for t
 	toReturn := make(map[string]utils.Item, itemsNr)
 
 	for i := 0; i < itemsNr; i++ {
-		newPokemon := utils.Item{
+		newItem := utils.Item{
 			Id:   primitive.NewObjectID(),
-			Name: fmt.Sprintf("item %d", i),
+			Name: fmt.Sprintf("item-%d", i),
 		}
-		toReturn[newPokemon.Id.Hex()] = newPokemon
+		toReturn[newItem.Id.Hex()] = newItem
 	}
 
 	return toReturn
@@ -184,7 +184,7 @@ func generateStarterPokemons(pokemonNr int) map[string]utils.Pokemon { //TODO on
 	for i := 0; i < pokemonNr; i++ {
 		newPokemon := utils.Pokemon{
 			Id:      primitive.NewObjectID(),
-			Species: fmt.Sprintf("species %d", i),
+			Species: fmt.Sprintf("species-%d", i),
 			Damage:  10,
 			Level:   0,
 		}
