@@ -31,12 +31,15 @@ func Status(w http.ResponseWriter, _ *http.Request) {
 // Registers a user. Expects a JSON with username and password in the body.
 func Register(w http.ResponseWriter, r *http.Request) {
 	var request RegisterRequest
+
 	err := json.NewDecoder(r.Body).Decode(&request)
 
 	if err != nil {
 		utils.HandleJSONDecodeError(&w, RegisterName, err)
 		return
 	}
+
+	log.Infof("Register request for: %s", request.Username)
 
 	exists, err := userdb.CheckIfUserExists(request.Username)
 
@@ -94,6 +97,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		utils.HandleJSONDecodeError(&w, LoginName, err)
 		return
 	}
+
+	log.Infof("Login request for: %s", request.Username)
 
 	err, user := userdb.GetUserByUsername(request.Username)
 
@@ -173,7 +178,8 @@ func generateStarterPokemons(pokemonNr int) map[string]utils.Pokemon { //TODO on
 			Id:      primitive.NewObjectID(),
 			Species: fmt.Sprintf("species-%d", i),
 			Damage:  10,
-			Level:   0,
+			Level:   10,
+			HP:      50,
 		}
 		toReturn[newPokemon.Id.Hex()] = newPokemon
 	}
