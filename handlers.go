@@ -33,7 +33,6 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	var request RegisterRequest
 
 	err := json.NewDecoder(r.Body).Decode(&request)
-
 	if err != nil {
 		utils.HandleJSONDecodeError(&w, RegisterName, err)
 		return
@@ -42,7 +41,6 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	log.Infof("Register request for: %s", request.Username)
 
 	exists, err := userdb.CheckIfUserExists(request.Username)
-
 	if err != nil {
 		log.Error(err)
 		http.Error(w, "Error occurred registering user", http.StatusInternalServerError)
@@ -60,7 +58,6 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err, id := userdb.AddUser(&userToAdd)
-
 	if err != nil {
 		log.Error(err)
 		http.Error(w, "Error occurred registering user", http.StatusInternalServerError)
@@ -73,12 +70,11 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		Pokemons: generateStarterPokemons(6),
 		Stats: utils.TrainerStats{
 			Level: 0,
-			Coins: 0,
+			Coins: 200,
 		},
 	}
 
 	_, err = trainersClient.AddTrainer(trainerToAdd)
-
 	if err != nil {
 		log.Error(err)
 		http.Error(w, "Error occurred registering trainer", http.StatusInternalServerError)
