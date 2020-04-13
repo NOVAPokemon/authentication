@@ -6,6 +6,8 @@ import (
 	"github.com/NOVAPokemon/utils"
 	"github.com/NOVAPokemon/utils/clients"
 	userdb "github.com/NOVAPokemon/utils/database/user"
+	"github.com/NOVAPokemon/utils/items"
+	"github.com/NOVAPokemon/utils/pokemons"
 	"github.com/NOVAPokemon/utils/tokens"
 	log "github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -149,12 +151,12 @@ func verifyPassword(password, expectedHash []byte) bool {
 	return true
 }
 
-func generateStarterItems(itemsNr int) map[string]utils.Item { //TODO only for testing
+func generateStarterItems(itemsNr int) map[string]items.Item { //TODO only for testing
 
-	toReturn := make(map[string]utils.Item, itemsNr)
+	toReturn := make(map[string]items.Item, itemsNr)
 
 	for i := 0; i < itemsNr; i++ {
-		newItem := utils.Item{
+		newItem := items.Item{
 			Id:   primitive.NewObjectID(),
 			Name: fmt.Sprintf("item-%d", i),
 		}
@@ -165,17 +167,18 @@ func generateStarterItems(itemsNr int) map[string]utils.Item { //TODO only for t
 
 }
 
-func generateStarterPokemons(pokemonNr int) map[string]utils.Pokemon { //TODO only for testing
+func generateStarterPokemons(pokemonNr int) map[string]pokemons.Pokemon { //TODO only for testing
 
-	toReturn := make(map[string]utils.Pokemon, pokemonNr)
+	toReturn := make(map[string]pokemons.Pokemon, pokemonNr)
 
 	for i := 0; i < pokemonNr; i++ {
-		newPokemon := utils.Pokemon{
+		newPokemon := pokemons.Pokemon{
 			Id:      primitive.NewObjectID(),
 			Species: fmt.Sprintf("species-%d", i),
 			Damage:  10,
 			Level:   10,
 			HP:      50,
+			MaxHP:   50,
 		}
 		toReturn[newPokemon.Id.Hex()] = newPokemon
 	}
