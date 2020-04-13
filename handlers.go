@@ -19,11 +19,7 @@ import (
 // Constants
 const StatusOnline = "online"
 
-var trainersClient *clients.TrainersClient
-
-func init() {
-	trainersClient = clients.NewTrainersClient(fmt.Sprintf("%s:%d", host, utils.TrainersPort))
-}
+var httpClient = &http.Client{}
 
 // Indicates if the server is online.
 func Status(w http.ResponseWriter, _ *http.Request) {
@@ -76,6 +72,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
+	trainersClient := clients.NewTrainersClient(fmt.Sprintf("%s:%d", host, utils.TrainersPort), httpClient)
 	_, err = trainersClient.AddTrainer(trainerToAdd)
 	if err != nil {
 		log.Error(err)
