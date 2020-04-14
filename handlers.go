@@ -6,7 +6,6 @@ import (
 	"github.com/NOVAPokemon/utils"
 	"github.com/NOVAPokemon/utils/clients"
 	userdb "github.com/NOVAPokemon/utils/database/user"
-	"github.com/NOVAPokemon/utils/items"
 	"github.com/NOVAPokemon/utils/pokemons"
 	"github.com/NOVAPokemon/utils/tokens"
 	log "github.com/sirupsen/logrus"
@@ -64,7 +63,6 @@ func Register(w http.ResponseWriter, r *http.Request) {
 
 	trainerToAdd := utils.Trainer{
 		Username: request.Username,
-		Items:    generateStarterItems(6),
 		Pokemons: generateStarterPokemons(6),
 		Stats: utils.TrainerStats{
 			Level: 0,
@@ -146,22 +144,6 @@ func verifyPassword(password, expectedHash []byte) bool {
 	}
 
 	return true
-}
-
-func generateStarterItems(itemsNr int) map[string]items.Item { //TODO only for testing
-
-	toReturn := make(map[string]items.Item, itemsNr)
-
-	for i := 0; i < itemsNr; i++ {
-		newItem := items.Item{
-			Id:   primitive.NewObjectID(),
-			Name: fmt.Sprintf("item-%d", i),
-		}
-		toReturn[newItem.Id.Hex()] = newItem
-	}
-
-	return toReturn
-
 }
 
 func generateStarterPokemons(pokemonNr int) map[string]pokemons.Pokemon { //TODO only for testing
