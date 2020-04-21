@@ -9,7 +9,6 @@ import (
 	"github.com/NOVAPokemon/utils/pokemons"
 	"github.com/NOVAPokemon/utils/tokens"
 	log "github.com/sirupsen/logrus"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"time"
@@ -146,22 +145,28 @@ func verifyPassword(password, expectedHash []byte) bool {
 	return true
 }
 
+/*
+  "max_level": 100.0,
+  "max_hp": 500.0,
+  "max_damage": 500.0,
+  "StdHpDeviation": 25.0,
+  "StdDamageDeviation": 25.0
+*/
+
 func generateStarterPokemons(pokemonNr int) map[string]pokemons.Pokemon { //TODO only for testing
 
 	toReturn := make(map[string]pokemons.Pokemon, pokemonNr)
 
 	for i := 0; i < pokemonNr; i++ {
-		newPokemon := pokemons.Pokemon{
-			Id:      primitive.NewObjectID(),
-			Species: fmt.Sprintf("species-%d", i),
-			Damage:  10,
-			Level:   10,
-			HP:      50,
-			MaxHP:   50,
-		}
-		toReturn[newPokemon.Id.Hex()] = newPokemon
+		newPokemon := pokemons.GetOneWildPokemon(
+			5,
+			500,
+			500,
+			25,
+			300,
+			fmt.Sprintf("starter-%d", i))
+		toReturn[newPokemon.Id.Hex()] = *newPokemon
 	}
-
 	return toReturn
 
 }
