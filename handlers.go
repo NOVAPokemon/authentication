@@ -69,7 +69,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	trainersClient := clients.NewTrainersClient(fmt.Sprintf("%s:%d", host, utils.TrainersPort), httpClient)
+	trainersClient := clients.NewTrainersClient(httpClient)
 	_, err = trainersClient.AddTrainer(trainerToAdd)
 	if err != nil {
 		log.Error(err)
