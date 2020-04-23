@@ -14,15 +14,7 @@ import (
 	"time"
 )
 
-// Constants
-const StatusOnline = "online"
-
 var httpClient = &http.Client{}
-
-// Indicates if the server is online.
-func Status(w http.ResponseWriter, _ *http.Request) {
-	_, _ = fmt.Fprintln(w, StatusOnline)
-}
 
 // Registers a user. Expects a JSON with username and password in the body.
 func Register(w http.ResponseWriter, r *http.Request) {

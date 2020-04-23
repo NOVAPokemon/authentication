@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-const host = utils.Host
+const host = utils.ServeHost
 const port = utils.AuthenticationPort
 
 func main() {

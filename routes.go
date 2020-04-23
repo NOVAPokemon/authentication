@@ -5,21 +5,14 @@ import (
 	"github.com/NOVAPokemon/utils/api"
 )
 
-const StatusName = "STATUS"
 const RegisterName = "REGISTER"
 const LoginName = "LOGIN"
 const RefreshName = "REFRESH"
 
-const GET = "GET"
 const POST = "POST"
 
 var routes = utils.Routes{
-	utils.Route{
-		Name:        StatusName,
-		Method:      GET,
-		Pattern:     api.StatusPath,
-		HandlerFunc: Status,
-	},
+	api.DefaultRoute,
 	utils.Route{
 		Name:        RegisterName,
 		Method:      POST,
