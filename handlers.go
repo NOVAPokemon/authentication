@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/NOVAPokemon/utils"
-	"github.com/NOVAPokemon/utils/api"
 	"github.com/NOVAPokemon/utils/clients"
 	userdb "github.com/NOVAPokemon/utils/database/user"
 	"github.com/NOVAPokemon/utils/pokemons"
@@ -22,9 +21,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
-		err = wrapRegisterHandlerError(api.WrapJSONDecodingError(err))
-		log.Error(err)
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		utils.LogAndSendHTTPError(&w, wrapRegisterHandlerError(err), http.StatusBadRequest)
 		return
 	}
 
@@ -32,25 +29,19 @@ func Register(w http.ResponseWriter, r *http.Request) {
 
 	exists, err := userdb.CheckIfUserExists(request.Username)
 	if err != nil {
-		err = wrapRegisterHandlerError(err)
-		log.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		utils.LogAndSendHTTPError(&w, wrapRegisterHandlerError(err), http.StatusInternalServerError)
 		return
 	}
 
 	if exists {
-		conflictError := newRegisterConflictError(request.Username)
-		err = wrapRegisterHandlerError(conflictError)
-		log.Warn(err)
-		http.Error(w, conflictError.Error(), http.StatusConflict)
+		err = wrapRegisterHandlerError(newRegisterConflictError(request.Username))
+		utils.LogAndSendHTTPError(&w, err, http.StatusConflict)
 		return
 	}
 
 	hash, err := hashPassword([]byte(request.Password))
 	if err != nil {
-		err = wrapRegisterHandlerError(err)
-		log.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		utils.LogAndSendHTTPError(&w, wrapRegisterHandlerError(err), http.StatusInternalServerError)
 		return
 	}
 
@@ -61,9 +52,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 
 	id, err := userdb.AddUser(&userToAdd)
 	if err != nil {
-		err = wrapRegisterHandlerError(err)
-		log.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		utils.LogAndSendHTTPError(&w, wrapRegisterHandlerError(err), http.StatusInternalServerError)
 		return
 	}
 
@@ -79,9 +68,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	trainersClient := clients.NewTrainersClient(httpClient)
 	_, err = trainersClient.AddTrainer(trainerToAdd)
 	if err != nil {
-		err = wrapRegisterHandlerError(err)
-		log.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		utils.LogAndSendHTTPError(&w, wrapRegisterHandlerError(err), http.StatusInternalServerError)
 		return
 	}
 
@@ -93,9 +80,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
-		err = wrapLoginHandlerError(api.WrapJSONDecodingError(err))
-		log.Error(err)
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		utils.LogAndSendHTTPError(&w, wrapLoginHandlerError(err), http.StatusBadRequest)
 		return
 	}
 
@@ -103,17 +88,13 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	user, err := userdb.GetUserByUsername(request.Username)
 	if err != nil {
-		err = wrapLoginHandlerError(err)
-		log.Error(err)
-		http.Error(w, err.Error(), http.StatusNotFound)
+		utils.LogAndSendHTTPError(&w, wrapLoginHandlerError(err), http.StatusNotFound)
 		return
 	}
 
 	if !verifyPassword([]byte(request.Password), user.PasswordHash) {
-		wrongPasswordError := newWrongPasswordError(request.Username)
-		err = wrapLoginHandlerError(wrongPasswordError)
-		log.Warn(err)
-		http.Error(w, wrongPasswordError.Error(), http.StatusBadRequest)
+		err = wrapLoginHandlerError(newWrongPasswordError(request.Username))
+		utils.LogAndSendHTTPError(&w, err, http.StatusBadRequest)
 		return
 	}
 
@@ -125,16 +106,13 @@ func Login(w http.ResponseWriter, r *http.Request) {
 func Refresh(w http.ResponseWriter, r *http.Request) {
 	claims, err := tokens.ExtractAndVerifyAuthToken(r.Header)
 	if err != nil {
-		err = wrapRefreshHandlerError(err)
-		log.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		utils.LogAndSendHTTPError(&w, wrapRefreshHandlerError(err), http.StatusInternalServerError)
+		return
 	}
 
 	if time.Unix(claims.ExpiresAt, 0).Sub(time.Now()) > 2*time.Minute {
-		refreshTooSoon := newRefreshTooSoonError(claims.Username)
-		err = wrapRefreshHandlerError(refreshTooSoon)
-		log.Error(err)
-		http.Error(w, refreshTooSoon.Error(), http.StatusBadRequest)
+		err = wrapRefreshHandlerError(newRefreshTooSoonError(claims.Username))
+		utils.LogAndSendHTTPError(&w, err, http.StatusBadRequest)
 		return
 	}
 
