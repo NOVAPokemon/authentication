@@ -2,13 +2,11 @@ package main
 
 import (
 	"fmt"
+	"github.com/NOVAPokemon/utils"
 	"github.com/pkg/errors"
 )
 
 const (
-	// Generic Handler errors
-	errorInHandlerFormat = "error in %s"
-
 	// RegisterHandler errors
 	errorRegisteringConflictFormat = "tried to register %s again"
 
@@ -24,7 +22,7 @@ const (
 
 // Register
 func wrapRegisterHandlerError(err error) error {
-	return errors.Wrap(err, fmt.Sprintf(errorInHandlerFormat, RegisterName))
+	return errors.Wrap(err, fmt.Sprintf(utils.ErrorInHandlerFormat, RegisterName))
 }
 
 func newRegisterConflictError(username string) error {
@@ -33,7 +31,7 @@ func newRegisterConflictError(username string) error {
 
 // Login
 func wrapLoginHandlerError(err error) error {
-	return errors.Wrap(err, fmt.Sprintf(errorInHandlerFormat, LoginName))
+	return errors.Wrap(err, fmt.Sprintf(utils.ErrorInHandlerFormat, LoginName))
 }
 
 func newWrongPasswordError(username string) error {
@@ -42,7 +40,7 @@ func newWrongPasswordError(username string) error {
 
 // Refresh
 func wrapRefreshHandlerError(err error) error {
-	return errors.Wrap(err, fmt.Sprintf(errorInHandlerFormat, RefreshName))
+	return errors.Wrap(err, fmt.Sprintf(utils.ErrorInHandlerFormat, RefreshName))
 }
 
 func newRefreshTooSoonError(username string) error {
