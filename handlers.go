@@ -16,13 +16,12 @@ import (
 
 var httpClient = &http.Client{}
 
-// Registers a user. Expects a JSON with username and password in the body.
 func Register(w http.ResponseWriter, r *http.Request) {
 	var request RegisterRequest
 
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
-		utils.HandleJSONDecodeError(&w, RegisterName, err)
+		utils.LogAndSendHTTPError(&w, wrapRegisterHandlerError(err), http.StatusBadRequest)
 		return
 	}
 
@@ -30,25 +29,30 @@ func Register(w http.ResponseWriter, r *http.Request) {
 
 	exists, err := userdb.CheckIfUserExists(request.Username)
 	if err != nil {
-		log.Error(err)
-		http.Error(w, "Error occurred registering user", http.StatusInternalServerError)
+		utils.LogAndSendHTTPError(&w, wrapRegisterHandlerError(err), http.StatusInternalServerError)
 		return
 	}
 
 	if exists {
-		http.Error(w, "User Already exists", http.StatusConflict)
+		err = wrapRegisterHandlerError(newRegisterConflictError(request.Username))
+		utils.LogAndSendHTTPError(&w, err, http.StatusConflict)
+		return
+	}
+
+	hash, err := hashPassword([]byte(request.Password))
+	if err != nil {
+		utils.LogAndSendHTTPError(&w, wrapRegisterHandlerError(err), http.StatusInternalServerError)
 		return
 	}
 
 	userToAdd := utils.User{
 		Username:     request.Username,
-		PasswordHash: hashPassword([]byte(request.Password)),
+		PasswordHash: hash,
 	}
 
-	err, id := userdb.AddUser(&userToAdd)
+	id, err := userdb.AddUser(&userToAdd)
 	if err != nil {
-		log.Error(err)
-		http.Error(w, "Error occurred registering user", http.StatusInternalServerError)
+		utils.LogAndSendHTTPError(&w, wrapRegisterHandlerError(err), http.StatusInternalServerError)
 		return
 	}
 
@@ -64,35 +68,33 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	trainersClient := clients.NewTrainersClient(httpClient)
 	_, err = trainersClient.AddTrainer(trainerToAdd)
 	if err != nil {
-		log.Error(err)
-		http.Error(w, "Error occurred registering trainer", http.StatusInternalServerError)
+		utils.LogAndSendHTTPError(&w, wrapRegisterHandlerError(err), http.StatusInternalServerError)
 		return
 	}
 
 	log.Infof("%s: %s %s %s\n", RegisterName, request.Username, id, id)
 }
 
-// Logs in a user. Expects a JSON with username and password in the body.
 func Login(w http.ResponseWriter, r *http.Request) {
 	var request LoginRequest
-	err := json.NewDecoder(r.Body).Decode(&request)
 
+	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
-		utils.HandleJSONDecodeError(&w, LoginName, err)
+		utils.LogAndSendHTTPError(&w, wrapLoginHandlerError(err), http.StatusBadRequest)
 		return
 	}
 
 	log.Infof("Login request for: %s", request.Username)
 
-	err, user := userdb.GetUserByUsername(request.Username)
-
+	user, err := userdb.GetUserByUsername(request.Username)
 	if err != nil {
-		http.Error(w, "User Not Found", http.StatusNotFound)
+		utils.LogAndSendHTTPError(&w, wrapLoginHandlerError(err), http.StatusNotFound)
 		return
 	}
 
 	if !verifyPassword([]byte(request.Password), user.PasswordHash) {
-		utils.HandleWrongPasswordError(&w, LoginName, request.Username, request.Password)
+		err = wrapLoginHandlerError(newWrongPasswordError(request.Username))
+		utils.LogAndSendHTTPError(&w, err, http.StatusBadRequest)
 		return
 	}
 
@@ -103,13 +105,14 @@ func Login(w http.ResponseWriter, r *http.Request) {
 // Endpoint to refresh the token. Expects the user to already have a token.
 func Refresh(w http.ResponseWriter, r *http.Request) {
 	claims, err := tokens.ExtractAndVerifyAuthToken(r.Header)
-
 	if err != nil {
+		utils.LogAndSendHTTPError(&w, wrapRefreshHandlerError(err), http.StatusInternalServerError)
 		return
 	}
 
 	if time.Unix(claims.ExpiresAt, 0).Sub(time.Now()) > 2*time.Minute {
-		utils.HandleToSoonToRefreshError(&w, RefreshName)
+		err = wrapRefreshHandlerError(newRefreshTooSoonError(claims.Username))
+		utils.LogAndSendHTTPError(&w, err, http.StatusBadRequest)
 		return
 	}
 
@@ -117,13 +120,13 @@ func Refresh(w http.ResponseWriter, r *http.Request) {
 	log.Infof("%s: %s\n", RefreshName, claims.Username)
 }
 
-func hashPassword(password []byte) (passwordHash []byte) {
+func hashPassword(password []byte) ([]byte, error) {
 	hash, err := bcrypt.GenerateFromPassword(password, bcrypt.MinCost)
 	if err != nil {
-		log.Error(err)
+		return nil, wrapHashPasswordError(err)
 	}
 
-	return hash
+	return hash, nil
 }
 
 func verifyPassword(password, expectedHash []byte) bool {
