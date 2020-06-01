@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/NOVAPokemon/utils"
 	"github.com/NOVAPokemon/utils/api"
 	"strings"
@@ -14,7 +13,7 @@ const RefreshName = "REFRESH"
 const POST = "POST"
 
 var routes = utils.Routes{
-	api.GenStatusRoute(strings.ToLower(fmt.Sprintf("/%s", serviceName))),
+	api.GenStatusRoute(strings.ToLower(serviceName)),
 	utils.Route{
 		Name:        RegisterName,
 		Method:      POST,
