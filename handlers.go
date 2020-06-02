@@ -148,7 +148,7 @@ func verifyPassword(password, expectedHash []byte) bool {
   "StdDamageDeviation": 25.0
 */
 
-func generateStarterPokemons(pokemonNr int) map[string]pokemons.Pokemon { //TODO only for testing
+func generateStarterPokemons(pokemonNr int) map[string]pokemons.Pokemon { // TODO only for testing
 
 	toReturn := make(map[string]pokemons.Pokemon, pokemonNr)
 
