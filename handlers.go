@@ -3,6 +3,9 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"time"
+
 	"github.com/NOVAPokemon/utils"
 	"github.com/NOVAPokemon/utils/clients"
 	userdb "github.com/NOVAPokemon/utils/database/user"
@@ -10,8 +13,6 @@ import (
 	"github.com/NOVAPokemon/utils/tokens"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
-	"net/http"
-	"time"
 )
 
 var httpClient = &http.Client{}
