@@ -14,9 +14,6 @@ const (
 	// Login errors
 	errorWrongPasswordFormat = "wrong password for user %s"
 
-	// Refresh errors
-	errorRefreshTooSoonFormat = "user %s tried to refresh token too soon"
-
 	// Others
 	errorHashPassword = "error hashing password"
 )
@@ -42,10 +39,6 @@ func newWrongPasswordError(username string) error {
 // Refresh
 func wrapRefreshHandlerError(err error) error {
 	return errors.Wrap(err, fmt.Sprintf(utils.ErrorInHandlerFormat, RefreshName))
-}
-
-func newRefreshTooSoonError(username string) error {
-	return errors.New(fmt.Sprintf(errorRefreshTooSoonFormat, username))
 }
 
 // Others

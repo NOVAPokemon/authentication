@@ -12,6 +12,7 @@ const LoginName = "LOGIN"
 const RefreshName = "REFRESH"
 
 const POST = "POST"
+const GET = "GET"
 
 var routes = utils.Routes{
 	api.GenStatusRoute(strings.ToLower(serviceName)),
@@ -29,7 +30,7 @@ var routes = utils.Routes{
 	},
 	utils.Route{
 		Name:        RefreshName,
-		Method:      POST,
+		Method:      GET,
 		Pattern:     api.RefreshPath,
 		HandlerFunc: Refresh,
 	},

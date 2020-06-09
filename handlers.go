@@ -3,9 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"net/http"
-	"time"
-
 	"github.com/NOVAPokemon/utils"
 	"github.com/NOVAPokemon/utils/clients"
 	userdb "github.com/NOVAPokemon/utils/database/user"
@@ -13,6 +10,7 @@ import (
 	"github.com/NOVAPokemon/utils/tokens"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
+	"net/http"
 )
 
 var httpClient = &http.Client{}
@@ -108,12 +106,6 @@ func Refresh(w http.ResponseWriter, r *http.Request) {
 	claims, err := tokens.ExtractAndVerifyAuthToken(r.Header)
 	if err != nil {
 		utils.LogAndSendHTTPError(&w, wrapRefreshHandlerError(err), http.StatusInternalServerError)
-		return
-	}
-
-	if time.Unix(claims.ExpiresAt, 0).Sub(time.Now()) > 2*time.Minute {
-		err = wrapRefreshHandlerError(newRefreshTooSoonError(claims.Username))
-		utils.LogAndSendHTTPError(&w, err, http.StatusBadRequest)
 		return
 	}
 
