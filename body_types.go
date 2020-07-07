@@ -1,11 +1,11 @@
 package main
 
-type RegisterRequest struct {
+type registerRequest struct {
 	Username string
 	Password string
 }
 
-type LoginRequest struct {
+type loginRequest struct {
 	Username string
 	Password string
 }

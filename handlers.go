@@ -16,8 +16,8 @@ import (
 
 var httpClient = &http.Client{}
 
-func Register(w http.ResponseWriter, r *http.Request) {
-	var request RegisterRequest
+func register(w http.ResponseWriter, r *http.Request) {
+	var request registerRequest
 
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
@@ -72,11 +72,11 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Infof("%s: %s %s %s\n", RegisterName, request.Username, id, id)
+	log.Infof("%s: %s %s %s\n", registerName, request.Username, id, id)
 }
 
-func Login(w http.ResponseWriter, r *http.Request) {
-	var request LoginRequest
+func login(w http.ResponseWriter, r *http.Request) {
+	var request loginRequest
 
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
@@ -99,11 +99,10 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	tokens.AddAuthToken(request.Username, w.Header())
-	log.Infof("%s: %s\n", LoginName, request.Username)
+	log.Infof("%s: %s\n", loginName, request.Username)
 }
 
-// Endpoint to refresh the token. Expects the user to already have a token.
-func Refresh(w http.ResponseWriter, r *http.Request) {
+func refresh(w http.ResponseWriter, r *http.Request) {
 	claims, err := tokens.ExtractAndVerifyAuthToken(r.Header)
 	if err != nil {
 		utils.LogAndSendHTTPError(&w, wrapRefreshHandlerError(err), http.StatusInternalServerError)
@@ -111,7 +110,7 @@ func Refresh(w http.ResponseWriter, r *http.Request) {
 	}
 
 	tokens.AddAuthToken(claims.Username, w.Header())
-	log.Infof("%s: %s\n", RefreshName, claims.Username)
+	log.Infof("%s: %s\n", refreshName, claims.Username)
 }
 
 func hashPassword(password []byte) ([]byte, error) {

@@ -7,31 +7,31 @@ import (
 	"github.com/NOVAPokemon/utils/api"
 )
 
-const RegisterName = "REGISTER"
-const LoginName = "LOGIN"
-const RefreshName = "REFRESH"
+const registerName = "REGISTER"
+const loginName = "LOGIN"
+const refreshName = "REFRESH"
 
-const POST = "POST"
-const GET = "GET"
+const post = "POST"
+const get = "GET"
 
 var routes = utils.Routes{
 	api.GenStatusRoute(strings.ToLower(serviceName)),
 	utils.Route{
-		Name:        RegisterName,
-		Method:      POST,
+		Name:        registerName,
+		Method:      post,
 		Pattern:     api.RegisterPath,
-		HandlerFunc: Register,
+		HandlerFunc: register,
 	},
 	utils.Route{
-		Name:        LoginName,
-		Method:      POST,
+		Name:        loginName,
+		Method:      post,
 		Pattern:     api.LoginPath,
-		HandlerFunc: Login,
+		HandlerFunc: login,
 	},
 	utils.Route{
-		Name:        RefreshName,
-		Method:      GET,
+		Name:        refreshName,
+		Method:      get,
 		Pattern:     api.RefreshPath,
-		HandlerFunc: Refresh,
+		HandlerFunc: refresh,
 	},
 }

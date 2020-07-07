@@ -20,7 +20,7 @@ const (
 
 // Register
 func wrapRegisterHandlerError(err error) error {
-	return errors.Wrap(err, fmt.Sprintf(utils.ErrorInHandlerFormat, RegisterName))
+	return errors.Wrap(err, fmt.Sprintf(utils.ErrorInHandlerFormat, registerName))
 }
 
 func newRegisterConflictError(username string) error {
@@ -29,7 +29,7 @@ func newRegisterConflictError(username string) error {
 
 // Login
 func wrapLoginHandlerError(err error) error {
-	return errors.Wrap(err, fmt.Sprintf(utils.ErrorInHandlerFormat, LoginName))
+	return errors.Wrap(err, fmt.Sprintf(utils.ErrorInHandlerFormat, loginName))
 }
 
 func newWrongPasswordError(username string) error {
@@ -38,7 +38,7 @@ func newWrongPasswordError(username string) error {
 
 // Refresh
 func wrapRefreshHandlerError(err error) error {
-	return errors.Wrap(err, fmt.Sprintf(utils.ErrorInHandlerFormat, RefreshName))
+	return errors.Wrap(err, fmt.Sprintf(utils.ErrorInHandlerFormat, refreshName))
 }
 
 // Others
