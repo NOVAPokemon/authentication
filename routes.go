@@ -7,12 +7,16 @@ import (
 	"github.com/NOVAPokemon/utils/api"
 )
 
-const registerName = "REGISTER"
-const loginName = "LOGIN"
-const refreshName = "REFRESH"
+const (
+	registerName = "REGISTER"
+	loginName    = "LOGIN"
+	refreshName  = "REFRESH"
+)
 
-const post = "POST"
-const get = "GET"
+const (
+	post = "POST"
+	get  = "GET"
+)
 
 var routes = utils.Routes{
 	api.GenStatusRoute(strings.ToLower(serviceName)),
