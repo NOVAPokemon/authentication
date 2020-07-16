@@ -11,6 +11,7 @@ import (
 	userdb "github.com/NOVAPokemon/utils/database/user"
 	"github.com/NOVAPokemon/utils/pokemons"
 	"github.com/NOVAPokemon/utils/tokens"
+	"github.com/NOVAPokemon/utils/websockets"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -18,7 +19,7 @@ import (
 var (
 	httpClient   = &http.Client{}
 	serverName   string
-	commsManager utils.CommunicationManager
+	commsManager websockets.CommunicationManager
 )
 
 func init() {
