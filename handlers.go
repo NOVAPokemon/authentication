@@ -4,9 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/NOVAPokemon/utils"
 	"github.com/NOVAPokemon/utils/clients"
+	"github.com/NOVAPokemon/utils/comms_manager"
 	userdb "github.com/NOVAPokemon/utils/database/user"
 	"github.com/NOVAPokemon/utils/pokemons"
 	"github.com/NOVAPokemon/utils/tokens"
@@ -14,8 +16,19 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-var httpClient = &http.Client{}
+var (
+	httpClient          = &http.Client{}
+	serverName          string
+	commsManager        comms_manager.CommunicationManager
+)
 
+func init() {
+	if aux, exists := os.LookupEnv(utils.HostnameEnvVar); exists {
+		serverName = aux
+	} else {
+		log.Fatal("Could not load server name")
+	}
+}
 func register(w http.ResponseWriter, r *http.Request) {
 	var request registerRequest
 
@@ -65,7 +78,7 @@ func register(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	trainersClient := clients.NewTrainersClient(httpClient)
+	trainersClient := clients.NewTrainersClient(httpClient, commsManager)
 	_, err = trainersClient.AddTrainer(trainerToAdd)
 	if err != nil {
 		utils.LogAndSendHTTPError(&w, wrapRegisterHandlerError(err), http.StatusInternalServerError)
