@@ -8,7 +8,6 @@ import (
 
 	"github.com/NOVAPokemon/utils"
 	"github.com/NOVAPokemon/utils/clients"
-	"github.com/NOVAPokemon/utils/comms_manager"
 	userdb "github.com/NOVAPokemon/utils/database/user"
 	"github.com/NOVAPokemon/utils/pokemons"
 	"github.com/NOVAPokemon/utils/tokens"
@@ -19,7 +18,7 @@ import (
 var (
 	httpClient   = &http.Client{}
 	serverName   string
-	commsManager comms_manager.CommunicationManager
+	commsManager utils.CommunicationManager
 )
 
 func init() {
