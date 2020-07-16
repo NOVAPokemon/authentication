@@ -17,9 +17,9 @@ import (
 )
 
 var (
-	httpClient          = &http.Client{}
-	serverName          string
-	commsManager        comms_manager.CommunicationManager
+	httpClient   = &http.Client{}
+	serverName   string
+	commsManager comms_manager.CommunicationManager
 )
 
 func init() {
