@@ -3,10 +3,8 @@ pipeline {
     stages {
             stage('Build executable') {
                 steps {
-                    parallel{
-                        container('golang') {
-                            sh 'build --race -v -o executable .'
-                        }
+                      container('golang') {
+                        sh 'build --race -v -o executable .'
                     }
                 }
             }
