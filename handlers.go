@@ -166,7 +166,7 @@ func generateStarterPokemons(pokemonNr int) map[string]pokemons.Pokemon { // TOD
 			25,
 			300,
 			fmt.Sprintf("starter-%d", i))
-		toReturn[newPokemon.Id.Hex()] = *newPokemon
+		toReturn[newPokemon.Id] = *newPokemon
 	}
 	return toReturn
 
