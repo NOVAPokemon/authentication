@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	originalHttp "net/http"
 	"os"
 
 	http "github.com/bruno-anjos/archimedesHTTPClient"
@@ -31,7 +30,7 @@ func init() {
 		log.Fatal("Could not load server name")
 	}
 }
-func register(w originalHttp.ResponseWriter, r *originalHttp.Request) {
+func register(w http.ResponseWriter, r *http.Request) {
 	var request registerRequest
 
 	err := json.NewDecoder(r.Body).Decode(&request)
@@ -90,7 +89,7 @@ func register(w originalHttp.ResponseWriter, r *originalHttp.Request) {
 	log.Infof("%s: %s %s %s\n", registerName, request.Username, id, id)
 }
 
-func login(w originalHttp.ResponseWriter, r *originalHttp.Request) {
+func login(w http.ResponseWriter, r *http.Request) {
 	var request loginRequest
 
 	err := json.NewDecoder(r.Body).Decode(&request)
@@ -117,7 +116,7 @@ func login(w originalHttp.ResponseWriter, r *originalHttp.Request) {
 	log.Infof("%s: %s\n", loginName, request.Username)
 }
 
-func refresh(w originalHttp.ResponseWriter, r *originalHttp.Request) {
+func refresh(w http.ResponseWriter, r *http.Request) {
 	claims, err := tokens.ExtractAndVerifyAuthToken(r.Header)
 	if err != nil {
 		utils.LogAndSendHTTPError(&w, wrapRefreshHandlerError(err), http.StatusInternalServerError)
