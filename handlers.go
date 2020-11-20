@@ -30,6 +30,7 @@ func init() {
 		log.Fatal("Could not load server name")
 	}
 }
+
 func register(w http.ResponseWriter, r *http.Request) {
 	var request registerRequest
 
