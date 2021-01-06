@@ -15,10 +15,11 @@ import (
 	"github.com/NOVAPokemon/utils/websockets"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
+	originalHTTP "net/http"
 )
 
 var (
-	httpClient   = &http.Client{}
+	httpClient   = &http.Client{Client: originalHTTP.Client{Timeout: clients.RequestTimeout}}
 	serverName   string
 	commsManager websockets.CommunicationManager
 )
