@@ -17,7 +17,7 @@ import (
 )
 
 var (
-	httpClient   = &http.Client{}
+	httpClient   = &http.Client{Client: originalHTTP.Client{Timeout: clients.RequestTimeout}}
 	serverName   string
 	commsManager websockets.CommunicationManager
 )
@@ -29,6 +29,7 @@ func init() {
 		log.Fatal("Could not load server name")
 	}
 }
+
 func register(w http.ResponseWriter, r *http.Request) {
 	var request registerRequest
 
@@ -137,7 +138,6 @@ func hashPassword(password []byte) ([]byte, error) {
 
 func verifyPassword(password, expectedHash []byte) bool {
 	err := bcrypt.CompareHashAndPassword(expectedHash, password)
-
 	if err != nil {
 		log.Println(err)
 		return false
@@ -169,5 +169,4 @@ func generateStarterPokemons(pokemonNr int) map[string]pokemons.Pokemon { // TOD
 		toReturn[newPokemon.Id] = *newPokemon
 	}
 	return toReturn
-
 }
