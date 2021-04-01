@@ -17,7 +17,9 @@ import (
 )
 
 var (
-	httpClient   = &http.Client{Client: originalHTTP.Client{Timeout: clients.RequestTimeout}}
+	httpClient  = &http.Client{Timeout: clients.RequestTimeout}
+	basicClient = clients.NewBasicClient(false, "")
+
 	serverName   string
 	commsManager websockets.CommunicationManager
 )
@@ -78,8 +80,8 @@ func register(w http.ResponseWriter, r *http.Request) {
 			Coins: 200,
 		},
 	}
-
-	trainersClient := clients.NewTrainersClient(httpClient, commsManager)
+	
+	trainersClient := clients.NewTrainersClient(httpClient, commsManager, basicClient)
 	_, err = trainersClient.AddTrainer(trainerToAdd)
 	if err != nil {
 		utils.LogAndSendHTTPError(&w, wrapRegisterHandlerError(err), http.StatusInternalServerError)
