@@ -7,6 +7,8 @@ import (
 
 	http "github.com/bruno-anjos/archimedesHTTPClient"
 
+	originalHTTP "net/http"
+
 	"github.com/NOVAPokemon/utils"
 	"github.com/NOVAPokemon/utils/clients"
 	userdb "github.com/NOVAPokemon/utils/database/user"
@@ -15,11 +17,15 @@ import (
 	"github.com/NOVAPokemon/utils/websockets"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
-	originalHTTP "net/http"
 )
 
 var (
-	httpClient   = &http.Client{Client: originalHTTP.Client{Timeout: clients.RequestTimeout}}
+	httpClient = &http.Client{
+		Client: originalHTTP.Client{
+			Timeout:   clients.RequestTimeout,
+			Transport: clients.NewTransport(),
+		},
+	}
 	serverName   string
 	commsManager websockets.CommunicationManager
 )
@@ -140,7 +146,6 @@ func hashPassword(password []byte) ([]byte, error) {
 
 func verifyPassword(password, expectedHash []byte) bool {
 	err := bcrypt.CompareHashAndPassword(expectedHash, password)
-
 	if err != nil {
 		log.Println(err)
 		return false
@@ -172,5 +177,4 @@ func generateStarterPokemons(pokemonNr int) map[string]pokemons.Pokemon { // TOD
 		toReturn[newPokemon.Id] = *newPokemon
 	}
 	return toReturn
-
 }
