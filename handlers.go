@@ -18,12 +18,10 @@ import (
 
 var (
 	httpClient = &http.Client{
-		Client: originalHTTP.Client{
-			Timeout:   clients.RequestTimeout,
-			Transport: clients.NewTransport(),
-		},
+		Timeout:   utils.Timeout,
+		Transport: clients.NewTransport(),
 	}
-	basicClient = clients.NewBasicClient(false, "")
+	basicClient  = clients.NewBasicClient(false, "")
 	serverName   string
 	commsManager websockets.CommunicationManager
 )
@@ -84,7 +82,7 @@ func register(w http.ResponseWriter, r *http.Request) {
 			Coins: 200,
 		},
 	}
-	
+
 	trainersClient := clients.NewTrainersClient(httpClient, commsManager, basicClient)
 	_, err = trainersClient.AddTrainer(trainerToAdd)
 	if err != nil {
